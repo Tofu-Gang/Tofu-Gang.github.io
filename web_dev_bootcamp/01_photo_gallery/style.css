@@ -1,0 +1,24 @@
+nav {
+    font-family: Raleway, sans-serif;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    border-bottom: 2px solid #f1f1f1;
+    width: 500px;
+    margin-left: 1.5%;
+    padding: 1.2em 0;
+}
+
+section {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    /* align-items: stretch; */
+    flex-wrap: wrap;
+}
+
+img {
+    width: 500px;
+    margin: 1.5%;
+}
