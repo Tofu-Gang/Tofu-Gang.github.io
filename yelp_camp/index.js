@@ -20,13 +20,9 @@ app.get("/", (request, response) => {
     response.render("home");
 });
 
-app.get("/makecampground", async (request, response) => {
-    const camp = new Campground({
-        title: "My Backyard",
-        description: "Cheap camping!",
-    });
-    await camp.save();
-    response.send(camp);
+app.get("/campgrounds", async (request, response) => {
+    const campgrounds = await Campground.find({});
+    response.render("campgrounds/index", { campgrounds });
 });
 
 app.listen(3000, () => {
