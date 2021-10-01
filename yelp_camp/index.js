@@ -12,6 +12,7 @@ db.once("open", () => {
 });
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -20,11 +21,25 @@ app.get("/", (request, response) => {
     response.render("home");
 });
 
+// list route
 app.get("/campgrounds", async (request, response) => {
     const campgrounds = await Campground.find({});
     response.render("campgrounds/index", { campgrounds });
 });
 
+// new route
+// has to be before show route, otherwise we hit the show route first and the "new" is treated as an id
+app.get("/campgrounds/new", (request, response) => {
+    response.render("campgrounds/new");
+});
+
+app.post("/campgrounds", async (request, response) => {
+    const campground = new Campground(request.body.campground);
+    await campground.save();
+    response.redirect(`/campgrounds/${campground._id}`);
+});
+
+// show route
 app.get("/campgrounds/:id", async (request, response) => {
     const id = request.params.id;
     const campground = await Campground.findById(id);
