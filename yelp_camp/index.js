@@ -3,6 +3,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground");
+const morgan = require("morgan");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
 
@@ -15,6 +16,7 @@ db.once("open", () => {
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
+app.use(morgan("dev"));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
