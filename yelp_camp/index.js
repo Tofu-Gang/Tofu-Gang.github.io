@@ -5,6 +5,8 @@ const methodOverride = require("method-override");
 const Campground = require("./models/campground");
 const morgan = require("morgan");
 const ejsMate = require("ejs-mate");
+const { prependListener } = require("process");
+const AppError = require("./appError");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
 
@@ -17,8 +19,8 @@ db.once("open", () => {
 const app = express();
 app.engine("ejs", ejsMate);
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
 app.use(morgan("dev"));
+app.use(methodOverride("_method"));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -72,9 +74,14 @@ app.delete("/campgrounds/:id", async (request, response) => {
     response.redirect("/campgrounds/");
 });
 
-// if no route matches
-app.use((request, response) => {
-    response.status(404).send("NOT FOUND!");
+app.get("/admin", (request, response) => {
+    throw new AppError("You are not an admin!", 403);
+});
+
+// error handling
+app.use((error, request, response, next) => {
+    const { status = 500, message = "Something went wrong!" } = error;
+    response.status(status).send(message);
 });
 
 app.listen(3000, () => {
