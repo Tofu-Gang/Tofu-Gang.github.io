@@ -3,10 +3,16 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const CampgroundSchema = new Schema({
-    title: String,
+    title: {
+        type: String,
+        required: true,
+    },
     price: Number,
     description: String,
-    location: String,
+    location: {
+        type: String,
+        required: true,
+    },
     image: String,
 });
 

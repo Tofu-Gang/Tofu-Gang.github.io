@@ -30,9 +30,14 @@ app.get("/", (request, response) => {
 });
 
 // list route
-app.get("/campgrounds", async (request, response) => {
-    const campgrounds = await Campground.find({});
-    response.render("campgrounds/index", { campgrounds });
+app.get("/campgrounds", async (request, response, next) => {
+    try {
+        const campgrounds = await Campground.find({});
+        response.render("campgrounds/index", { campgrounds });
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
 // new route
@@ -41,41 +46,81 @@ app.get("/campgrounds/new", (request, response) => {
     response.render("campgrounds/new");
 });
 
-app.post("/campgrounds", async (request, response) => {
-    const campground = new Campground(request.body.campground);
-    await campground.save();
-    response.redirect(`/campgrounds/${campground._id}`);
+app.post("/campgrounds", async (request, response, next) => {
+    try {
+        const campground = new Campground(request.body.campground);
+        await campground.save();
+        response.redirect(`/campgrounds/${campground._id}`);
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
 // show route
-app.get("/campgrounds/:id", async (request, response) => {
-    const id = request.params.id;
-    const campground = await Campground.findById(id);
-    response.render("campgrounds/show", { campground });
+app.get("/campgrounds/:id", async (request, response, next) => {
+    try {
+        const id = request.params.id;
+        const campground = await Campground.findById(id);
+        if (!campground) {
+            // error thrown in a try block will be handled in the catch block
+            throw new AppError("CAMPGROUND NOT FOUND", 404);
+        } else {
+            response.render("campgrounds/show", { campground });
+        }
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
 // edit route
-app.get("/campgrounds/:id/edit", async (request, response) => {
-    const id = request.params.id;
-    const campground = await Campground.findById(id);
-    response.render("campgrounds/edit", { campground });
+app.get("/campgrounds/:id/edit", async (request, response, next) => {
+    try {
+        const id = request.params.id;
+        const campground = await Campground.findById(id);
+        if (!campground) {
+            // error thrown in a try block will be handled in the catch block
+            throw new AppError("CAMPGROUND NOT FOUND", 404);
+        } else {
+            response.render("campgrounds/edit", { campground });
+        }
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
-app.put("/campgrounds/:id", async (request, response) => {
-    const { id } = request.params;
-    const campground = await Campground.findByIdAndUpdate(id, { ...request.body.campground });
-    response.redirect(`/campgrounds/${campground._id}`);
+app.put("/campgrounds/:id", async (request, response, next) => {
+    try {
+        const { id } = request.params;
+        const campground = await Campground.findByIdAndUpdate(
+            id,
+            { ...request.body.campground },
+            { runValidators: true }
+        );
+        response.redirect(`/campgrounds/${campground._id}`);
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
 // delete route
-app.delete("/campgrounds/:id", async (request, response) => {
-    const { id } = request.params;
-    await Campground.findByIdAndDelete(id);
-    response.redirect("/campgrounds/");
+app.delete("/campgrounds/:id", async (request, response, next) => {
+    try {
+        const { id } = request.params;
+        await Campground.findByIdAndDelete(id);
+        response.redirect("/campgrounds/");
+    } catch (error) {
+        // the error has to be passed in next() call in async function instead of throwing it
+        next(error);
+    }
 });
 
-app.get("/admin", (request, response) => {
-    throw new AppError("You are not an admin!", 403);
+// for testing only
+app.get("/error", (request, response) => {
+    throw new AppError("NOT ALLOWED!", 401);
 });
 
 // error handling
