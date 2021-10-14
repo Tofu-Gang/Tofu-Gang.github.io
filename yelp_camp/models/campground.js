@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const CampgroundSchema = new Schema({
     title: {
         type: String,
-        required: true,
+        required: [true, "Name cannot be blank."],
     },
     price: Number,
     description: String,
