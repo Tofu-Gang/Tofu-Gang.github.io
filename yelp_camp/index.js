@@ -2,11 +2,13 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
-const Campground = require("./models/campground");
 const morgan = require("morgan");
 const ejsMate = require("ejs-mate");
-const { prependListener } = require("process");
-const AppError = require("./appError");
+
+const Campground = require("./models/campground");
+const ExpressError = require("./utils/ExpressError");
+const wrapAsync = require("./utils/wrapAsync");
+const validateCampground = require("./utils/validateCampground");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
 
@@ -46,6 +48,7 @@ app.get("/campgrounds/new", (request, response) => {
 
 app.post(
     "/campgrounds",
+    validateCampground,
     wrapAsync(async (request, response, next) => {
         const campground = new Campground(request.body.campground);
         await campground.save();
@@ -60,8 +63,8 @@ app.get(
         const id = request.params.id;
         const campground = await Campground.findById(id);
         if (!campground) {
-            // error thrown in a try block will be handled in the catch block
-            throw new AppError("CAMPGROUND NOT FOUND", 404);
+            // throw the error for wrapAsync() function to handle it
+            throw new ExpressError("CAMPGROUND NOT FOUND", 404);
         } else {
             response.render("campgrounds/show", { campground });
         }
@@ -75,8 +78,8 @@ app.get(
         const id = request.params.id;
         const campground = await Campground.findById(id);
         if (!campground) {
-            // error thrown in a try block will be handled in the catch block
-            throw new AppError("CAMPGROUND NOT FOUND", 404);
+            // throw the error for wrapAsync() function to handle it
+            throw new ExpressError("CAMPGROUND NOT FOUND", 404);
         } else {
             response.render("campgrounds/edit", { campground });
         }
@@ -85,6 +88,7 @@ app.get(
 
 app.put(
     "/campgrounds/:id",
+    validateCampground,
     wrapAsync(async (request, response, next) => {
         const { id } = request.params;
         const campground = await Campground.findByIdAndUpdate(
@@ -106,43 +110,16 @@ app.delete(
     })
 );
 
-// for testing only
-app.get("/error", (request, response) => {
-    throw new AppError("NOT ALLOWED!", 401);
+// catch-all 404
+app.all("*", (request, response, next) => {
+    next(new ExpressError("Page Not Found", 404));
 });
 
 // error handling
 app.use((error, request, response, next) => {
-    console.log(error.name);
-    if (error.name === "ValidationError") {
-        error = handleValidationError(error);
-    } else if (error.name === "CastError") {
-        error = handleCastError(error);
-    }
-    next(error);
+    const { statusCode = 500, message = "Something went wrong!", stack } = error;
+    response.status(statusCode).render("error", { message, stack });
 });
-
-app.use((error, request, response, next) => {
-    const { status = 500, message = "Something went wrong!" } = error;
-    response.status(status).send(message);
-});
-
-function wrapAsync(fn) {
-    return function (request, response, next) {
-        // the error has to be passed in next() call in async function instead of throwing it
-        fn(request, response, next).catch((error) => next(error));
-    };
-}
-
-const handleValidationError = (error) => {
-    console.log(error);
-    return new AppError(`Validation failed...${error.message}`, 400);
-};
-
-const handleCastError = (error) => {
-    console.log(error);
-    return new AppError(`Cannot cast this...${error.message}`, 400);
-};
 
 app.listen(3000, () => {
     console.log("Serving on port 3000");
