@@ -1,0 +1,213 @@
+:root {
+    --background-color-light: #fffcf5;
+    --flowers-width: 375px;
+    --navbar-hover-transition-duration: 0.5s;
+    --navbar-hover-color: #929088;
+    --navbar-height: 70px;
+    --tile-width: 370px;
+    --tile-height: 228px;
+    --tiles-gap: 30px;
+    --title-height: 40px;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background: linear-gradient(var(--background-color-light) 90%, rgba(0, 0, 0, 0.3));
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 0;
+    font-family: "Barlow Condensed", sans-serif;
+
+    /* disable text selection */
+    user-select: none; /* supported by Chrome and Opera */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+#flowers {
+    position: absolute;
+    width: var(--flowers-width);
+    left: 0;
+    top: 0;
+}
+
+#navbar {
+    font-size: 30pt;
+    font-weight: 500;
+    position: relative;
+    margin: 0 auto;
+    top: 90px;
+    bottom: 60px;
+    width: calc((3 * var(--tile-width)) + (2 * var(--tiles-gap)));
+    height: var(--navbar-height);
+}
+
+/* Marek Pišl */
+#navbar span:nth-child(1) {
+    letter-spacing: 0.02em;
+    transition-property: color;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+#navbar span:nth-child(1):hover {
+    color: var(--navbar-hover-color);
+    transition-property: color;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+/* animated leaves */
+#navbar img:nth-child(2) {
+    position: relative;
+    bottom: 20px;
+    animation: 2s cubic-bezier(0, 0, 1, -0.5) 0s 1 fadein;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* vita */
+#navbar span:nth-child(3) {
+    position: absolute;
+    font-weight: 400;
+    vertical-align: middle;
+    right: 60px;
+    transition-property: color;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+#navbar span:nth-child(3):hover {
+    color: var(--navbar-hover-color);
+    transition-property: color;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+/* email */
+#navbar img:nth-child(4) {
+    position: absolute;
+    right: 0;
+    top: 20px;
+    width: 26.25px;
+    height: 21px;
+    transition-property: filter;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+#navbar img:nth-child(4):hover {
+    /* This filter achieves the --navbar-hover-color color, svg in img tag cannot be colored directly by color or fill properties */
+    /* Filter generator: https://codepen.io/sosuke/pen/Pjoqqp */
+    filter: invert(63%) sepia(5%) saturate(440%) hue-rotate(11deg) brightness(90%) contrast(90%);
+    transition-property: filter;
+    transition-duration: var(--navbar-hover-transition-duration);
+}
+
+#tiles {
+    position: relative;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--tiles-gap);
+    top: 120px;
+    width: calc((3 * var(--tile-width)) + (2 * var(--tiles-gap)));
+    height: calc((3 * var(--tile-height)) + (2 * var(--tiles-gap)));
+}
+
+.tile {
+    position: relative;
+    width: var(--tile-width);
+    height: var(--tile-height);
+}
+
+.tile_non_hover {
+    position: relative;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.tile_non_hover:hover {
+    opacity: 0;
+}
+
+.title {
+    background-color: rgba(0, 0, 0, 0.75);
+    height: var(--title-height);
+    width: 100%;
+    position: absolute;
+    top: calc(var(--tile-height) - var(--title-height));
+    font-size: 16pt;
+    text-align: center;
+    line-height: calc(
+        var(--title-height) - 2px
+    ); /* It should be just title height, but it has to be adjusted for the vertical align to be correct. */
+}
+
+.title span {
+    font-weight: 500;
+    color: #fffcf5;
+    letter-spacing: 0.03em;
+    vertical-align: baseline;
+}
+
+.tile_hover {
+    background-color: black;
+    color: var(--background-color-light);
+    font-size: 30pt;
+    width: var(--tile-width);
+    height: var(--tile-height);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+}
+
+.tile_hover p {
+    margin: 0;
+}
+
+.tile_hover div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.tile_hover hr {
+    position: relative;
+    border: none;
+    margin: 0;
+    width: calc(var(--tile-width) - 20px);
+    height: 1px;
+    left: 10px;
+    right: 10px;
+    background-color: var(--background-color-light);
+}
+
+.tile_hover hr:first-of-type {
+    top: 10px;
+}
+
+.tile_hover hr:last-of-type {
+    bottom: 10px;
+}
+
+footer {
+    width: 100%;
+    bottom: 20px;
+    position: fixed;
+    text-align: center;
+    color: #fffcf5;
+}
